@@ -1,0 +1,123 @@
+﻿@using System
+@model EmotionDemo.Models.SentimentAnalyzeModel
+
+@{
+    ViewData["Title"] = "SentimentAnalyzeResult";
+    double sentimentScore = Model.EmotionResult.Documents[0].Score ?? 0.5;
+
+    if (sentimentScore <= 0.3)
+    {
+        Model.SentimentValue = ((0.3 - sentimentScore) / 0.3).ToString("P2");
+        Model.SentimentType = "negative";
+        Model.SentimentText = "Negative";
+    }
+    else
+    {
+        if (sentimentScore >= 0.7)
+        {
+            Model.SentimentValue = ((sentimentScore - 0.7) / 0.3).ToString("P2");
+            Model.SentimentType = "positive";
+            Model.SentimentText = "Positive";
+        }
+        else
+        {
+            if (sentimentScore <= 0.5)
+            {
+                Model.SentimentValue = (1 - ((0.5 - sentimentScore) / 0.2)).ToString("P2");
+            }
+            else
+            {
+                Model.SentimentValue = (1 - ((sentimentScore - 0.5) / 0.2)).ToString("P2");
+            }
+            Model.SentimentType = "neutral";
+            Model.SentimentText = "Neutral";
+        }
+    }
+}
+
+<h2>Sentiment Analyze</h2>
+
+<div class="row">
+    <section>
+        <form asp-controller="DemoSentimentAnalyze" asp-action="Analyze" method="POST"
+              class="form-horizontal" enctype="multipart/form-data">
+            <table>
+                <tr>
+                    <td>
+                        <input type="text" name="TextStr" class="form-control" />
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-default">Analyze</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </section>
+</div>
+
+<h2>Result</h2>
+<div>
+    <dl class="dl-horizontal">
+        <dt>
+            Text :
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TextStr)
+        </dd>
+        <dt>
+            Sentiment Type :
+        </dt>
+        <dd>
+            @Model.SentimentText
+        </dd>
+        <dt>
+            Sentiment Score :
+        </dt>
+        <dd>
+            @Model.SentimentValue
+        </dd>
+    </dl>
+    <div class="container">
+        <div class="sentiment @Model.SentimentType" style="width:@Model.SentimentValue">
+            @Model.SentimentValue
+        </div>
+    </div>
+</div>
+<div>
+    <hr />
+    <p>
+        <a asp-controller="Home" asp-action="Index">Return to Index</a>
+    </p>
+</div>
+
+<style>
+    /* Make sure that padding behaves as expected */
+    * {
+        box-sizing: border-box
+    }
+
+    /* Container for skill bars */
+    .container {
+        width: 100%; /* Full width */
+        background-color: #ddd; /* Grey background */
+    }
+
+    .sentiment {
+        text-align: right; /* Right-align text */
+        padding: 10px; /* Add some padding */
+        color: white; /* White text color */
+    }
+
+    .positive {
+        background-color: #4CAF50;
+    }
+    /* Green */
+    .neutral {
+        background-color: #2196F3;
+    }
+    /* Blue */
+    .negative {
+        background-color: #f44336;
+    }
+    /* Red */
+</style>
